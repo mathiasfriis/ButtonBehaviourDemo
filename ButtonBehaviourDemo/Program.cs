@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using ButtonBehaviourDemo.Events;
 using ButtonBehaviourDemo.Services;
+using ButtonBehaviourDemo.Configurations;
 
 // In-memory Event Bus
 public class EventBus
@@ -39,11 +40,17 @@ class Program
 {
     static async Task Main()
     {
+        ButtonInterpretationServiceConfiguration buttonInterpretationServiceConf = new ButtonInterpretationServiceConfiguration
+        {
+            _multiPressTimeout = 500, // Example timeout in milliseconds
+            _pressAndHoldTimeout = 1000 // Example timeout in milliseconds
+        };
+
         var bus = new EventBus();
         var userService = new UserService(bus);
         var orderService = new OrderService(bus);
         var buttonService = new ButtonService(bus);
-        var buttonInterpretationService = new ButtonInterpretationService(bus);
+        var buttonInterpretationService = new ButtonInterpretationService(bus, buttonInterpretationServiceConf);
         buttonInterpretationService.addKeyToMonitorList('a');
         Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
