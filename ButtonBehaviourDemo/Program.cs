@@ -42,20 +42,26 @@ class Program
         var bus = new EventBus();
         var userService = new UserService(bus);
         var orderService = new OrderService(bus);
+        var buttonService = new ButtonService(bus);
+        var buttonInterpretationService = new ButtonInterpretationService(bus);
+        buttonInterpretationService.addKeyToMonitorList('a');
 
 
-        while(true)
+        while (true)
         {
-            var userName = Console.ReadLine();
-            if(string.IsNullOrEmpty(userName))
+            ConsoleKeyInfo key = Console.ReadKey(intercept: true); // true = don't display the key
+            DateTime timestamp = DateTime.Now;
+            char keyChar = key.KeyChar;
+            switch (keyChar)
             {
-                Console.WriteLine("Bye!");
-                break;
-            }
-            else
-            {
-                await userService.CreateUser(userName);
-                await Task.Delay(100); // Allow async messages to process
+                case 'q':
+                    Console.WriteLine("\nExiting...");
+                    return;
+                default:
+                    {
+                        await buttonService.NotifyButtonPressed(keyChar, timestamp);
+                        break;
+                    }
             }
         }
     }
