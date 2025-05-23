@@ -17,14 +17,20 @@ class Program
             _pressAndHoldTimeout = 1000 // Example timeout in milliseconds
         };
 
+        ButtonBehaviourServiceConfiguration buttonBehaviourServiceConfiguration = new ButtonBehaviourServiceConfiguration
+        {
+        };
+
         var bus = new EventBus();
         var buttonService = new ButtonService(bus);
         var buttonInterpretationService = new ButtonInterpretationService(bus, buttonInterpretationServiceConf);
+        var buttonBehaviourService = new ButtonBehaviourService(bus, buttonBehaviourServiceConfiguration);
         buttonInterpretationService.addKeyToMonitorList('a');
         Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
         buttonService.Start(10); // Start the button service with a 10ms interval
         buttonInterpretationService.Start(10); // Start the button interpretation service with a 10ms interval
+        buttonBehaviourService.Start(10); // Start the button behaviour service with a 10ms interval
 
         while (true)
         {

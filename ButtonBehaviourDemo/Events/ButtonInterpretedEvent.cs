@@ -14,7 +14,6 @@ namespace ButtonBehaviourDemo.Events
             ePressed,
             eReleased,
             ePressAndHold,
-            eMultiPress,
         }
         public char _buttonId { get; set; }
         public ButtonEvent _buttonEvent { get; set; }

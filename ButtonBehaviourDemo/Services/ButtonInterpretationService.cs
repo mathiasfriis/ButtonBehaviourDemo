@@ -29,7 +29,7 @@ namespace ButtonBehaviourDemo.Services
 
         private void NotifyInterpretedButtonEvent(char key, DateTime timestamp, ButtonInterpretedEvent.ButtonEvent buttonEvent, uint numMultiPresses = 0)
         {
-            Console.WriteLine($"[ButtonInterpretationService] Interpreted event for key: {key}, Event: {buttonEvent}, Time: {timestamp}");
+            Console.WriteLine($"[ButtonInterpretationService] Interpreted event for key: {key}, Event: {buttonEvent}, Time: {timestamp}, MultiPresses: {numMultiPresses}");
             Publish(new ButtonInterpretedEvent { _buttonId = key, _timeStamp = timestamp, _buttonEvent = buttonEvent});
         }
 
@@ -49,7 +49,6 @@ namespace ButtonBehaviourDemo.Services
                         if (timeDiff.TotalMilliseconds >= _conf._pressAndHoldTimeout)
                         {
                             // Press and hold detected, notify the system.
-                            Console.WriteLine($"[ButtonInterpretationService] Press and hold detected for key: {buttonId}, Duration: {timeDiff.TotalMilliseconds} ms");
                             _buttonToPressAndHoldNotifiedMap[buttonId] = true;
                             NotifyInterpretedButtonEvent(buttonId, timeNow, ButtonInterpretedEvent.ButtonEvent.ePressAndHold);
                         }
@@ -68,7 +67,7 @@ namespace ButtonBehaviourDemo.Services
 
             if (_buttonToLastPressTimeMap.ContainsKey(evt._buttonId))
             {
-                Console.WriteLine($"[ButtonInterpretationService] Key: " + evt._buttonId + " , State: " + evt._buttonState + ", Time: " + evt._timeStamp.ToString());
+                //Console.WriteLine($"[ButtonInterpretationService] Key: " + evt._buttonId + " , State: " + evt._buttonState + ", Time: " + evt._timeStamp.ToString());
 
                 // Check for multiPress
                 switch(evt._buttonState)
@@ -81,21 +80,27 @@ namespace ButtonBehaviourDemo.Services
                         {
                             // MultiPress detected
                             _buttonToConsecutivePressesMap[evt._buttonId]++;
-                            Console.WriteLine($"[ButtonInterpretationService] MultiPress detected for key: {evt._buttonId}, Count: {_buttonToConsecutivePressesMap[evt._buttonId]}");
-                            NotifyInterpretedButtonEvent(evt._buttonId, evt._timeStamp, ButtonInterpretedEvent.ButtonEvent.eMultiPress, _buttonToConsecutivePressesMap[evt._buttonId]);
+                            NotifyInterpretedButtonEvent(evt._buttonId, evt._timeStamp, ButtonInterpretedEvent.ButtonEvent.ePressed, _buttonToConsecutivePressesMap[evt._buttonId]);
                             }
                         else
                         {
                             // Reset consecutive presses count
                             _buttonToConsecutivePressesMap[evt._buttonId] = 1;
-                            Console.WriteLine($"[ButtonInterpretationService] Single Press detected for key: {evt._buttonId}");
-                        }
+                            NotifyInterpretedButtonEvent(evt._buttonId, evt._timeStamp, ButtonInterpretedEvent.ButtonEvent.ePressed, _buttonToConsecutivePressesMap[evt._buttonId]);
+                            }
                         _buttonToLastPressTimeMap[evt._buttonId] = evt._timeStamp; // Update the last press time for this button.
                         break;
                     }
+                        case ButtonStateChangedEvent.ButtonState.eReleased:
+                    {
+                        // Reset the press and hold notification for this button when it is released.
+                        _buttonToPressAndHoldNotifiedMap[evt._buttonId] = false;
+                        NotifyInterpretedButtonEvent(evt._buttonId, evt._timeStamp, ButtonInterpretedEvent.ButtonEvent.eReleased);
+                        break;
+                        }
                     default:
                     {
-                        _buttonToPressAndHoldNotifiedMap[evt._buttonId] = false;
+                        throw new InvalidOperationException("Unknown button state: " + evt._buttonState);
                         break;
                     }
                 }
