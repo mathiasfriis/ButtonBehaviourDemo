@@ -54,6 +54,7 @@ class Program
         buttonInterpretationService.addKeyToMonitorList('a');
         Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
+        _ = StartPeriodicPressAndHoldMonitoringAsync(buttonInterpretationService, TimeSpan.FromMilliseconds(10)); // Start the periodic monitoring in the background
 
         while (true)
         {
@@ -81,6 +82,16 @@ class Program
                         break;
                     }
             }
+        }
+    }
+
+    static async Task StartPeriodicPressAndHoldMonitoringAsync(ButtonInterpretationService buttonInterpretationService, TimeSpan interval, CancellationToken cancellationToken = default)
+    {
+        int counter = 0;
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            buttonInterpretationService.CheckForPressAndHold();
+            await Task.Delay(interval, cancellationToken);
         }
     }
 }

@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 
 namespace ButtonBehaviourDemo.Events
 {
-    public class ButtonStateChangedEvent : IEvent
+    public class ButtonInterpretedEvent : IEvent
     {
-        public enum ButtonState
+        public enum ButtonEvent
         {
             eUnknown,
             ePressed,
-            eReleased
+            eReleased,
+            ePressAndHold,
+            eMultiPress,
         }
         public char _buttonId { get; set; }
-        public ButtonState _buttonState { get; set; }
+        public ButtonEvent _buttonEvent { get; set; }
         public DateTime _timeStamp { get; set; }
     }
 }
