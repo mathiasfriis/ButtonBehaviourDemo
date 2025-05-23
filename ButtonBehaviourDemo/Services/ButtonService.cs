@@ -11,9 +11,9 @@ namespace ButtonBehaviourDemo.Services
         {
             _bus = bus;
         }
-        public async Task NotifyButtonPressed(char key, DateTime timestamp)
+        public async Task NotifyButtonPressed(char key, DateTime timestamp, ButtonStateChangedEvent.ButtonState buttonState)
         {
-            await _bus.Publish(new ButtonStateChangedEvent { ButtonId = key, TimeStamp = timestamp});
+            await _bus.Publish(new ButtonStateChangedEvent { _buttonId = key, _timeStamp = timestamp, _buttonState = buttonState});
         }
 
        

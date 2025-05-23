@@ -20,18 +20,18 @@ namespace ButtonBehaviourDemo.Services
         }
         public async Task NotifyButtonPressed(char key, DateTime timestamp)
         {
-            await _bus.Publish(new ButtonStateChangedEvent { ButtonId = key, TimeStamp = timestamp });
+            await _bus.Publish(new ButtonStateChangedEvent { _buttonId = key, _timeStamp = timestamp });
         }
 
         private Task HandleButtonStateChanged(ButtonStateChangedEvent evt)
         {
-            if(_buttonToTimeStampMap.ContainsKey(evt.ButtonId))
+            if(_buttonToTimeStampMap.ContainsKey(evt._buttonId))
             {
-                Console.WriteLine($"[OrderService] Detected Button press for button: " + evt.ButtonId + " at time: " + evt.TimeStamp.ToString());
+                Console.WriteLine($"[OrderService] Key: " + evt._buttonId + " , State: " + evt._buttonState + ", Time: " + evt._timeStamp.ToString());
             }
             else
             {
-                Console.WriteLine("Key '" + evt.ButtonId + "' unknown to ButtonInterpretationService");
+                Console.WriteLine("Key '" + evt._buttonId + "' unknown to ButtonInterpretationService");
             }
             
             return Task.CompletedTask;

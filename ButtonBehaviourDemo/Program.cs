@@ -45,6 +45,7 @@ class Program
         var buttonService = new ButtonService(bus);
         var buttonInterpretationService = new ButtonInterpretationService(bus);
         buttonInterpretationService.addKeyToMonitorList('a');
+        Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
 
         while (true)
@@ -59,7 +60,17 @@ class Program
                     return;
                 default:
                     {
-                        await buttonService.NotifyButtonPressed(keyChar, timestamp);
+                        if(buttonStateMap.ContainsKey(keyChar))
+                        {
+                            buttonStateMap[keyChar] = !buttonStateMap[keyChar]; // Toggle state
+                        }
+                        else
+                        {
+                            buttonStateMap[keyChar] = true; // First press, set to pressed
+                        }
+
+                        ButtonStateChangedEvent.ButtonState buttonState = buttonStateMap[keyChar] ? ButtonStateChangedEvent.ButtonState.ePressed : ButtonStateChangedEvent.ButtonState.eReleased;
+                        await buttonService.NotifyButtonPressed(keyChar, timestamp, buttonState);
                         break;
                     }
             }

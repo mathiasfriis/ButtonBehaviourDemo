@@ -8,7 +8,13 @@ namespace ButtonBehaviourDemo.Events
 {
     public class ButtonStateChangedEvent : IEvent
     {
-        public char ButtonId { get; set; }
-        public DateTime TimeStamp { get; set; }
+        public enum ButtonState
+        {
+            ePressed,
+            eReleased
+        }
+        public char _buttonId { get; set; }
+        public ButtonState _buttonState { get; set; }
+        public DateTime _timeStamp { get; set; }
     }
 }
