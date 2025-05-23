@@ -43,10 +43,20 @@ class Program
         var userService = new UserService(bus);
         var orderService = new OrderService(bus);
 
-        await userService.CreateUser("alice");
-        await Task.Delay(100); // Allow async messages to process
 
-        Console.WriteLine("Press Enter to exit...");
-        Console.ReadLine();
+        while(true)
+        {
+            var userName = Console.ReadLine();
+            if(string.IsNullOrEmpty(userName))
+            {
+                Console.WriteLine("Bye!");
+                break;
+            }
+            else
+            {
+                await userService.CreateUser(userName);
+                await Task.Delay(100); // Allow async messages to process
+            }
+        }
     }
 }
