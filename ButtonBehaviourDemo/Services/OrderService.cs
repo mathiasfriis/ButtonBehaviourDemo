@@ -1,23 +1,15 @@
 ﻿using ButtonBehaviourDemo.Events;
-using System;
-using System.Threading.Tasks;
 
-
-namespace ButtonBehaviourDemo.Services
+public class OrderService : BaseService
 {
-    public class OrderService
+    public OrderService(EventBus bus) : base(bus)
     {
-        private readonly EventBus _bus;
-        public OrderService(EventBus bus)
-        {
-            _bus = bus;
-            _bus.Subscribe<UserCreatedEvent>(HandleUserCreated);
-        }
+        Subscribe<UserCreatedEvent>(HandleUserCreated);
+    }
 
-        private Task HandleUserCreated(UserCreatedEvent evt)
-        {
-            Console.WriteLine($"[OrderService] Detected new user: {evt.Username}. Placing order...");
-            return _bus.Publish(new OrderPlacedEvent { OrderId = new Random().Next(1000, 9999) });
-        }
+    private void HandleUserCreated(UserCreatedEvent evt)
+    {
+        Console.WriteLine($"[OrderService] Detected new user: {evt.Username}. Placing order...");
+        Publish(new OrderPlacedEvent { OrderId = new Random().Next(1000, 9999) });
     }
 }

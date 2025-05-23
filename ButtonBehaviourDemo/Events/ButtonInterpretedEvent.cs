@@ -19,5 +19,7 @@ namespace ButtonBehaviourDemo.Events
         public char _buttonId { get; set; }
         public ButtonEvent _buttonEvent { get; set; }
         public DateTime _timeStamp { get; set; }
+
+        public uint _numMultiPresses { get; set; } = 0; // Number of multi presses detected.
     }
 }

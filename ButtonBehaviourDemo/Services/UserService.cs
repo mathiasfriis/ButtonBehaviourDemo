@@ -1,28 +1,20 @@
 ﻿using ButtonBehaviourDemo.Events;
-using System;
-using System.Threading.Tasks;
 
-namespace ButtonBehaviourDemo.Services
+public class UserService : BaseService
 {
-    public class UserService
+    public UserService(EventBus bus) : base(bus)
     {
-        private readonly EventBus _bus;
-        public UserService(EventBus bus)
-        {
-            _bus = bus;
-            _bus.Subscribe<OrderPlacedEvent>(HandleOrderPlaced);
-        }
+        Subscribe<OrderPlacedEvent>(HandleOrderPlaced);
+    }
 
-        private Task HandleOrderPlaced(OrderPlacedEvent evt)
-        {
-            Console.WriteLine($"[UserService] Received order ID {evt.OrderId}");
-            return Task.CompletedTask;
-        }
+    private void HandleOrderPlaced(OrderPlacedEvent evt)
+    {
+        Console.WriteLine($"[UserService] Received order ID {evt.OrderId}");
+    }
 
-        public async Task CreateUser(string username)
-        {
-            Console.WriteLine($"[UserService] Creating user: {username}");
-            await _bus.Publish(new UserCreatedEvent { Username = username });
-        }
+    public void CreateUser(string username)
+    {
+        Console.WriteLine($"[UserService] Creating user: {username}");
+        Publish(new UserCreatedEvent { Username = username });
     }
 }

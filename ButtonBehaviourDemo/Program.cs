@@ -6,35 +6,6 @@ using ButtonBehaviourDemo.Events;
 using ButtonBehaviourDemo.Services;
 using ButtonBehaviourDemo.Configurations;
 
-// In-memory Event Bus
-public class EventBus
-{
-    private readonly ConcurrentDictionary<Type, List<Func<IEvent, Task>>> _handlers = new();
-
-    public void Subscribe<T>(Func<T, Task> handler) where T : IEvent
-    {
-        var type = typeof(T);
-        if (!_handlers.ContainsKey(type))
-            _handlers[type] = new List<Func<IEvent, Task>>();
-
-        _handlers[type].Add((evt) => handler((T)evt));
-    }
-
-    public async Task Publish<T>(T @event) where T : IEvent
-    {
-        var type = typeof(T);
-        if (_handlers.TryGetValue(type, out var handlers))
-        {
-            foreach (var handler in handlers)
-            {
-                await handler(@event);
-            }
-        }
-    }
-}
-
-
-
 // Entry Point
 class Program
 {
@@ -47,14 +18,13 @@ class Program
         };
 
         var bus = new EventBus();
-        var userService = new UserService(bus);
-        var orderService = new OrderService(bus);
         var buttonService = new ButtonService(bus);
         var buttonInterpretationService = new ButtonInterpretationService(bus, buttonInterpretationServiceConf);
         buttonInterpretationService.addKeyToMonitorList('a');
         Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
-        _ = StartPeriodicPressAndHoldMonitoringAsync(buttonInterpretationService, TimeSpan.FromMilliseconds(10)); // Start the periodic monitoring in the background
+        buttonService.Start(10); // Start the button service with a 10ms interval
+        buttonInterpretationService.Start(10); // Start the button interpretation service with a 10ms interval
 
         while (true)
         {
@@ -78,7 +48,7 @@ class Program
                         }
 
                         ButtonStateChangedEvent.ButtonState buttonState = buttonStateMap[keyChar] ? ButtonStateChangedEvent.ButtonState.ePressed : ButtonStateChangedEvent.ButtonState.eReleased;
-                        await buttonService.NotifyButtonPressed(keyChar, timestamp, buttonState);
+                        buttonService.NotifyButtonPressed(keyChar, timestamp, buttonState);
                         break;
                     }
             }

@@ -5,9 +5,8 @@ using System.Threading.Tasks;
 
 namespace ButtonBehaviourDemo.Services
 {
-    public class ButtonInterpretationService
+    public class ButtonInterpretationService : BaseService
     {
-        private readonly EventBus _bus;
         private readonly Dictionary<char, ButtonStateChangedEvent.ButtonState> _buttonStateMap = new(); // Map that tracks the state of each button.
         private readonly Dictionary<char, DateTime> _buttonToLastPressTimeMap = new(); // Map that tracks the last time each button was pressed.
         private readonly Dictionary<char, UInt16> _buttonToConsecutivePressesMap = new(); // Map that tracks how many consecutive presses have been detected for each button.
@@ -21,18 +20,17 @@ namespace ButtonBehaviourDemo.Services
             _buttonStateMap.Add(keyToMonitor, ButtonStateChangedEvent.ButtonState.eUnknown); // Initialize with a default value of unknown state.
             _buttonToPressAndHoldNotifiedMap.Add(keyToMonitor, false); // Initialize with a default value of false.
         }
-        public ButtonInterpretationService(EventBus bus, ButtonInterpretationServiceConfiguration conf)
+        public ButtonInterpretationService(EventBus bus, ButtonInterpretationServiceConfiguration conf) : base(bus)
         {
             _conf = conf;
 
-            _bus = bus;
-            _bus.Subscribe<ButtonStateChangedEvent>(HandleButtonStateChanged);
+            Subscribe<ButtonStateChangedEvent>(HandleButtonStateChanged);
         }
 
-        private async Task NotifyInterpretedButtonEvent(char key, DateTime timestamp, ButtonInterpretedEvent.ButtonEvent buttonEvent)
+        private void NotifyInterpretedButtonEvent(char key, DateTime timestamp, ButtonInterpretedEvent.ButtonEvent buttonEvent, uint numMultiPresses = 0)
         {
             Console.WriteLine($"[ButtonInterpretationService] Interpreted event for key: {key}, Event: {buttonEvent}, Time: {timestamp}");
-            await _bus.Publish(new ButtonInterpretedEvent { _buttonId = key, _timeStamp = timestamp, _buttonEvent = buttonEvent});
+            Publish(new ButtonInterpretedEvent { _buttonId = key, _timeStamp = timestamp, _buttonEvent = buttonEvent});
         }
 
         public async void CheckForPressAndHold()
@@ -53,20 +51,24 @@ namespace ButtonBehaviourDemo.Services
                             // Press and hold detected, notify the system.
                             Console.WriteLine($"[ButtonInterpretationService] Press and hold detected for key: {buttonId}, Duration: {timeDiff.TotalMilliseconds} ms");
                             _buttonToPressAndHoldNotifiedMap[buttonId] = true;
-                            await NotifyInterpretedButtonEvent(buttonId, timeNow, ButtonInterpretedEvent.ButtonEvent.ePressAndHold);
+                            NotifyInterpretedButtonEvent(buttonId, timeNow, ButtonInterpretedEvent.ButtonEvent.ePressAndHold);
                         }
                     }
                 }
             }
         }
 
-        private Task HandleButtonStateChanged(ButtonStateChangedEvent evt)
+        protected override void Service() 
+        {
+            CheckForPressAndHold();
+        }
+        private void HandleButtonStateChanged(ButtonStateChangedEvent evt)
         {
             _buttonStateMap[evt._buttonId] = evt._buttonState;
 
             if (_buttonToLastPressTimeMap.ContainsKey(evt._buttonId))
             {
-                Console.WriteLine($"[OrderService] Key: " + evt._buttonId + " , State: " + evt._buttonState + ", Time: " + evt._timeStamp.ToString());
+                Console.WriteLine($"[ButtonInterpretationService] Key: " + evt._buttonId + " , State: " + evt._buttonState + ", Time: " + evt._timeStamp.ToString());
 
                 // Check for multiPress
                 switch(evt._buttonState)
@@ -80,7 +82,8 @@ namespace ButtonBehaviourDemo.Services
                             // MultiPress detected
                             _buttonToConsecutivePressesMap[evt._buttonId]++;
                             Console.WriteLine($"[ButtonInterpretationService] MultiPress detected for key: {evt._buttonId}, Count: {_buttonToConsecutivePressesMap[evt._buttonId]}");
-                        }
+                            NotifyInterpretedButtonEvent(evt._buttonId, evt._timeStamp, ButtonInterpretedEvent.ButtonEvent.eMultiPress, _buttonToConsecutivePressesMap[evt._buttonId]);
+                            }
                         else
                         {
                             // Reset consecutive presses count
@@ -101,8 +104,6 @@ namespace ButtonBehaviourDemo.Services
             {
                 Console.WriteLine("Key '" + evt._buttonId + "' unknown to ButtonInterpretationService");
             }
-            
-            return Task.CompletedTask;
         }
     }
 }
