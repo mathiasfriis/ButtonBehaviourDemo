@@ -33,7 +33,7 @@ namespace ButtonBehaviourDemo.Services
             Publish(new ButtonInterpretedEvent { _buttonId = key, _timeStamp = timestamp, _buttonEvent = buttonEvent});
         }
 
-        public async void CheckForPressAndHold()
+        public async void CheckForPressAndHold() // Getting the time should be done through an interface, allowing mocking in unit tests.
         {
             var timeNow = DateTime.Now;
             foreach(var buttonState in _buttonStateMap)
