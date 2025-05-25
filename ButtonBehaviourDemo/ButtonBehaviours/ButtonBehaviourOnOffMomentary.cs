@@ -1,16 +1,18 @@
-﻿using System;
+﻿using ButtonBehaviourDemo.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ButtonBehaviourDemo.Events.ButtonStateChangedEvent;
 
 namespace ButtonBehaviourDemo.ButtonBehaviours
 {
-    internal class ButtonBehaviourOnOffMomentary : IButtonBehaviour
+    internal class ButtonBehaviourOnOffMomentary : ButtonBehaviourOnOff
     {
-        public void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
+        public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {
-            // Simple state machine that sets the parameter to true on press and false on release.
+            // Simple state machine that registers press events and toggles the state of the parameter.
             switch (evt._buttonEvent)
             {
                 case Events.ButtonInterpretedEvent.ButtonEvent.ePressed:
@@ -21,7 +23,7 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
                 }
                 case Events.ButtonInterpretedEvent.ButtonEvent.eReleased:
                 {
-                    // Handle button released event
+                    // Handle button pressed event
                     SetParameterState(false);
                     break;
                 }
@@ -31,24 +33,9 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
                 }
             }
         }
-        private void SetParameterState(bool value)
-        {
-            // Logic to set the parameter value
-            Console.WriteLine($"Setting {_parameterToControl} to {value}");
-            _isOn = value;
-        }
 
-        private bool GetParameterState()
+        public ButtonBehaviourOnOffMomentary(EventBus eventbus, string parameterToControl) : base(eventbus, parameterToControl)
         {
-            return _isOn;
-        }
-
-        private string _parameterToControl;
-        private bool _isOn = false;
-
-        public ButtonBehaviourOnOffMomentary(string parameterToControl)
-        {
-            _parameterToControl = parameterToControl;
         }
 
 

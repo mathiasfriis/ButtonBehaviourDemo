@@ -8,8 +8,8 @@ namespace ButtonBehaviourDemo.Services
 {
     public class ButtonBehaviourService : BaseService
     {
-        ButtonBehaviourOnOffMomentary buttonBehaviourOnOffLatching = new ButtonBehaviourOnOffMomentary("testParm");
         ButtonBehaviourServiceConfiguration _conf;
+        Dictionary<char, BaseButtonBehaviour> _buttonBehaviours = new Dictionary<char, BaseButtonBehaviour>();
 
         public ButtonBehaviourService(EventBus bus, ButtonBehaviourServiceConfiguration conf) : base(bus)
         {
@@ -19,8 +19,19 @@ namespace ButtonBehaviourDemo.Services
         }
         private void HandleButtonInterpretedEvent(ButtonInterpretedEvent evt)
         {
-            Console.WriteLine($"[ButtonBehaviourService] Interpreted event for key: {evt._buttonId}, Event: {evt._buttonEvent}, Time: {evt._timeStamp}");
-            buttonBehaviourOnOffLatching.handleButtonInterpretedEvent(evt);
+            if (_buttonBehaviours.TryGetValue(evt._buttonId, out var buttonBehaviour))
+            {
+                buttonBehaviour.handleButtonInterpretedEvent(evt);
+            }
+            else
+            {
+                Console.WriteLine($"[ButtonBehaviourService] No behaviour found for button {evt._buttonId}");
+            }
+        }
+
+        public void SetButtonBehaviour(char buttonId, BaseButtonBehaviour buttonBehaviour)
+        {
+            _buttonBehaviours[buttonId] = buttonBehaviour;
         }
     }
 }

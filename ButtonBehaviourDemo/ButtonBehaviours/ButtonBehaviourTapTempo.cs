@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ButtonBehaviourDemo.ButtonBehaviours
 {
-    internal class ButtonBehaviourTapTempo : IButtonBehaviour
+    public class ButtonBehaviourTapTempo : BaseButtonBehaviour
     {
-        public void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
+        public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {
             // Simple state machine that registers press events and relays the time stamp message to part of the system that takes care of tempo management.
             switch (evt._buttonEvent)
@@ -23,6 +23,13 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
                     break;
                 }
             }
+        }
+
+        string _tempoId;
+
+        public ButtonBehaviourTapTempo(EventBus eventbus, string tempoId) : base(eventbus)
+        {
+            _tempoId = tempoId;
         }
     }
 }

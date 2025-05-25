@@ -6,6 +6,7 @@ using ButtonBehaviourDemo.Events;
 using ButtonBehaviourDemo.Services;
 using ButtonBehaviourDemo.Configurations;
 using ButtonBehaviourDemo.Time;
+using ButtonBehaviourDemo.ButtonBehaviours;
 
 // Entry Point
 class Program
@@ -30,6 +31,8 @@ class Program
         buttonInterpretationService.addKeyToMonitorList('a');
         Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
+        buttonBehaviourService.SetButtonBehaviour('a', new ButtonBehaviourOnOffLatching(bus, "testParm")); // Set a specific behaviour for the 'a' button
+
         buttonService.Start(10); // Start the button service with a 10ms interval
         buttonInterpretationService.Start(10); // Start the button interpretation service with a 10ms interval
         buttonBehaviourService.Start(10); // Start the button behaviour service with a 10ms interval
@@ -44,6 +47,18 @@ class Program
                 case 'q':
                     Console.WriteLine("\nExiting...");
                     return;
+                case 'm':
+                    buttonBehaviourService.SetButtonBehaviour('a', new ButtonBehaviourOnOffMomentary(bus, "testParm")); // Set a specific behaviour for the 'a' button
+                    break;
+                case 'l':
+                    buttonBehaviourService.SetButtonBehaviour('a', new ButtonBehaviourOnOffLatching(bus, "testParm")); // Set a specific behaviour for the 'a' button
+                    break;
+                case 't':
+                    buttonBehaviourService.SetButtonBehaviour('a', new ButtonBehaviourTapTempo(bus, "myTempoId")); // Set a specific behaviour for the 'a' button
+                    break;
+                case 'c': // c = composite
+                    buttonBehaviourService.SetButtonBehaviour('a', new ButtonBehaviourOnOffLatchingPlusTapTempo(bus, "testParm", "myTempoId")); // Set a specific behaviour for the 'a' button
+                    break;
                 default:
                     {
                         if(buttonStateMap.ContainsKey(keyChar))

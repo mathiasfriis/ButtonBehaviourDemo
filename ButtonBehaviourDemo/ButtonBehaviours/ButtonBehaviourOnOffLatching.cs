@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ButtonBehaviourDemo.ButtonBehaviours
 {
-    internal class ButtonBehaviourOnOffLatching : IButtonBehaviour
+    public class ButtonBehaviourOnOffLatching : ButtonBehaviourOnOff
     {
-        public void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt) 
+        public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {
             // Simple state machine that registers press events and toggles the state of the parameter.
             switch (evt._buttonEvent)
@@ -25,24 +25,9 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
                 }
             }
         }
-        private void SetParameterState(bool value) {
-            // Logic to set the parameter value
-            Console.WriteLine($"Setting {_parameterToControl} to {value}");
-            _isOn = value;
-        }
 
-        private bool GetParameterState()
+        public ButtonBehaviourOnOffLatching(EventBus eventbus, string parameterToControl) : base(eventbus, parameterToControl)
         {
-            return _isOn;
         }
-
-        private string _parameterToControl;
-        private bool _isOn = false;
-
-        public ButtonBehaviourOnOffLatching(string parameterToControl) {
-            _parameterToControl = parameterToControl;
-        }
-
-
     }
 }
