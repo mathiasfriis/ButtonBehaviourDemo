@@ -15,7 +15,7 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
             {
                 case Events.ButtonInterpretedEvent.ButtonEvent.ePressed:
                 {
-                    Console.WriteLine("Sending TimeStamp message to TempoManagementService");
+                    _eventBus.Publish(new Events.TempoTimeStampEvent { _tempoId = _tempoId, _timestamp = evt._timeStamp });
                     break;
                 }
                 default:
