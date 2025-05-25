@@ -58,7 +58,7 @@ public class MultiEventCollectorService : BaseService
 
 
     // Optionally override the periodic Service hook for any processing
-    protected override void Service()
+    public override void Service()
     {
         // Example: you could process or log collected events here periodically
     }

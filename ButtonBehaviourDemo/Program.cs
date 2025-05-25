@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ButtonBehaviourDemo.Events;
 using ButtonBehaviourDemo.Services;
 using ButtonBehaviourDemo.Configurations;
+using ButtonBehaviourDemo.Time;
 
 // Entry Point
 class Program
@@ -14,7 +15,8 @@ class Program
         ButtonInterpretationServiceConfiguration buttonInterpretationServiceConf = new ButtonInterpretationServiceConfiguration
         {
             _multiPressTimeout = 500, // Example timeout in milliseconds
-            _pressAndHoldTimeout = 1000 // Example timeout in milliseconds
+            _pressAndHoldTimeout = 1000, // Example timeout in milliseconds
+            _timeProvider = new TimeSystem() // Using a system time provider for real-time functionality
         };
 
         ButtonBehaviourServiceConfiguration buttonBehaviourServiceConfiguration = new ButtonBehaviourServiceConfiguration

@@ -11,7 +11,7 @@ namespace ButtonBehaviourDemo.Services
         private readonly Dictionary<char, DateTime> _buttonToLastPressTimeMap = new(); // Map that tracks the last time each button was pressed.
         private readonly Dictionary<char, UInt16> _buttonToConsecutivePressesMap = new(); // Map that tracks how many consecutive presses have been detected for each button.
         private readonly Dictionary<char, bool> _buttonToPressAndHoldNotifiedMap = new(); // Map that tracks if a press and hold notification has been sent for each button.
-        ButtonInterpretationServiceConfiguration _conf;
+        public ButtonInterpretationServiceConfiguration _conf;
 
         public void addKeyToMonitorList(char keyToMonitor) // This could also be done via a configuration.
         {
@@ -23,7 +23,6 @@ namespace ButtonBehaviourDemo.Services
         public ButtonInterpretationService(EventBus bus, ButtonInterpretationServiceConfiguration conf) : base(bus)
         {
             _conf = conf;
-
             Subscribe<ButtonStateChangedEvent>(HandleButtonStateChanged);
         }
 
@@ -35,8 +34,8 @@ namespace ButtonBehaviourDemo.Services
 
         public async void CheckForPressAndHold() // Getting the time should be done through an interface, allowing mocking in unit tests.
         {
-            var timeNow = DateTime.Now;
-            foreach(var buttonState in _buttonStateMap)
+            var timeNow = _conf._timeProvider.GetTime(); // Get the current time from the configured time provider.
+            foreach (var buttonState in _buttonStateMap)
             {
                 char buttonId = buttonState.Key;
                 // For any pressed button, check if the time since last press is greater than the configured timeout.
@@ -57,7 +56,7 @@ namespace ButtonBehaviourDemo.Services
             }
         }
 
-        protected override void Service() 
+        public override void Service() 
         {
             CheckForPressAndHold();
         }

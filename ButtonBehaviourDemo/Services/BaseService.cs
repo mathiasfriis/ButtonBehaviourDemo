@@ -17,7 +17,7 @@ public abstract class BaseService : IService
 
     public void HandleEvents() => _queue.Process();
 
-    protected virtual void Service() { } // Hook for any logic that needs to be executed periodically.
+    public virtual void Service() { } // Hook for any logic that needs to be executed periodically. Public for testing purposes.
 
     protected void Subscribe<T>(Action<T> handler) where T : IEvent
     {

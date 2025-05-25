@@ -2,8 +2,10 @@
 using ButtonBehaviourDemo.Events;
 using ButtonBehaviourDemo.Services;
 using NUnit.Framework;
-using static ButtonBehaviourDemo.Events.ButtonInterpretedEvent;
+using ButtonBehaviourDemo.Events;
+using ButtonBehaviourDemo.Time;
 using static ButtonBehaviourDemo.Events.ButtonStateChangedEvent;
+using static ButtonBehaviourDemo.Events.ButtonInterpretedEvent;
 
 namespace ButtonBehaviourTest
 {
@@ -18,13 +20,17 @@ namespace ButtonBehaviourTest
         ButtonInterpretationService buttonInterpretationService;
         MultiEventCollectorService rx; // rx = receiver
         EventBus eventBus;
+        TimeMock timeMock;
+
         [SetUp]
         public void Setup()
         {   
+            timeMock = new TimeMock(); // Mock time provider for testing
             ButtonInterpretationServiceConfiguration buttonInterpretationServiceConf = new ButtonInterpretationServiceConfiguration
             {
                 _multiPressTimeout = MULTIPRESS_TIMEOUT, // Example timeout in milliseconds
-                _pressAndHoldTimeout = PRESS_AND_HOLD_TIMEOUT // Example timeout in milliseconds
+                _pressAndHoldTimeout = PRESS_AND_HOLD_TIMEOUT, // Example timeout in milliseconds
+                _timeProvider = timeMock
             };
 
             eventBus = new EventBus();
@@ -68,6 +74,29 @@ namespace ButtonBehaviourTest
 
             Assert.That(rx.Received<ButtonInterpretedEvent>(), Is.EqualTo(1));
             Assert.That(rx.ReceivedSimilar<ButtonInterpretedEvent>(new ButtonInterpretedEvent { _buttonId = TEST_KEY, _timeStamp = TIME_ZERO, _buttonEvent = ButtonEvent.ePressed, _numMultiPresses = 1 }), Is.EqualTo(1));
+
+
+        }
+
+        [Test]
+        public void PressAndHold_PressAndHoldMessageSent()
+        {
+            DateTime currentTime = TIME_ZERO;
+            timeMock.SetTime(currentTime);
+            simulateButtonPress(TIME_ZERO);
+
+            handleEvents(5);
+
+            currentTime = currentTime.AddMilliseconds(PRESS_AND_HOLD_TIMEOUT); // Simulate time passing
+            timeMock.SetTime(currentTime);
+
+            buttonInterpretationService.Service();
+
+            handleEvents(5);
+
+            Assert.That(rx.Received<ButtonInterpretedEvent>(), Is.EqualTo(2)); // Button press + Press and hold
+            Assert.That(rx.ReceivedSimilar<ButtonInterpretedEvent>(new ButtonInterpretedEvent { _buttonId = TEST_KEY, _timeStamp = TIME_ZERO, _buttonEvent = ButtonEvent.ePressed, _numMultiPresses = 1 }), Is.EqualTo(1));
+            Assert.That(rx.ReceivedSimilar<ButtonInterpretedEvent>(new ButtonInterpretedEvent { _buttonId = TEST_KEY, _timeStamp = currentTime, _buttonEvent = ButtonEvent.ePressAndHold, _numMultiPresses = 1 }), Is.EqualTo(1));
         }
     }
 }
