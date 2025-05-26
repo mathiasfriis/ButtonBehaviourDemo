@@ -180,5 +180,148 @@ namespace ButtonBehaviourTest
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(3));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
         }
+
+        [Test]
+        public void ButtonBehaviourOnOffLatchingPlusTapTempo_TurnsEffectOnOffPrDefault()
+        {
+            DateTime time = TIME_ZERO;
+
+            buttonBehaviourService.SetButtonBehaviour(TEST_KEY, new ButtonBehaviourDemo.ButtonBehaviours.ButtonBehaviourOnOffLatchingPlusTapTempo(eventBus, PARAMETER_NAME, TEMPO_ID));
+
+            Assert.That(rx.Received<ButtonInterpretedEvent>(), Is.EqualTo(0));
+
+            //Simulate a regular button press, including release shortly after.
+            simulateButtonPress(time);
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter on
+            Assert.That(rx.Received<ParameterUpdateEvent>(), Is.EqualTo(1));
+            Assert.That(rx.ReceivedSimilar<ParameterUpdateEvent>(new ParameterUpdateEvent { _parameterName = PARAMETER_NAME, _parameterValue = 1 }), Is.EqualTo(1));
+
+            //Simulate a regular button press, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPress(time);
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter off
+            Assert.That(rx.Received<ParameterUpdateEvent>(), Is.EqualTo(2));
+            Assert.That(rx.ReceivedSimilar<ParameterUpdateEvent>(new ParameterUpdateEvent { _parameterName = PARAMETER_NAME, _parameterValue = 0 }), Is.EqualTo(1));
+
+            // Check that we never received any tempo messages
+            Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ButtonBehaviourOnOffLatchingPlusTapTempo_CanEnterTapTempoSessionViaPressAndHold()
+        {
+            DateTime time = TIME_ZERO;
+            DateTime timeLastPress;
+
+            buttonBehaviourService.SetButtonBehaviour(TEST_KEY, new ButtonBehaviourDemo.ButtonBehaviours.ButtonBehaviourOnOffLatchingPlusTapTempo(eventBus, PARAMETER_NAME, TEMPO_ID));
+
+            //Simulate a regular button press, including release shortly after.
+            simulateButtonPressAndHold(time);
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            //Simulate a regular button press, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPress(time);
+            timeLastPress = time;
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter off
+            Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(1));
+            Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
+
+            //Simulate a regular button press, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPress(time);
+            timeLastPress = time;
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter off
+            Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(2));
+            Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
+
+            //Simulate a regular button press, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPress(time);
+            timeLastPress = time;
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter off
+            Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(3));
+            Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
+        }
+
+        [Test]
+        public void ButtonBehaviourOnOffLatchingPlusTapTempo_CanExitTapTempoSessionViaPressAndHold()
+        {
+            DateTime time = TIME_ZERO;
+            DateTime timeLastPress;
+
+            buttonBehaviourService.SetButtonBehaviour(TEST_KEY, new ButtonBehaviourDemo.ButtonBehaviours.ButtonBehaviourOnOffLatchingPlusTapTempo(eventBus, PARAMETER_NAME, TEMPO_ID));
+
+            //Simulate a press and hold, including release shortly after.
+            simulateButtonPressAndHold(time);
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // We should now be in Tap Tempo session, so tempo events are sent instead of parameter updates.
+
+            //Simulate a regular button press, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPress(time);
+            timeLastPress = time;
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter off
+            Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(1));
+            Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
+
+            //Simulate a press and hold, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPressAndHold(time);
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            // We should now be in the latching on/off mode.
+
+            //Simulate a regular button press, including release shortly after.
+            time = time.AddMilliseconds(3000);
+            simulateButtonPress(time);
+            timeLastPress = time;
+            time = time.AddMilliseconds(100);
+            simulateButtonRelease(time);
+
+            handleEvents(1);
+
+            // Check that we receieved a message to turn the parameter on
+            Assert.That(rx.Received<ParameterUpdateEvent>(), Is.EqualTo(1));
+            Assert.That(rx.ReceivedSimilar<ParameterUpdateEvent>(new ParameterUpdateEvent { _parameterName = PARAMETER_NAME, _parameterValue = 1 }), Is.EqualTo(1));
+        }
     }
 }
