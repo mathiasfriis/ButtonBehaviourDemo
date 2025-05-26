@@ -11,5 +11,14 @@ namespace ButtonBehaviourDemo.Events
     {
         public string _tempoId { get; set; }
         public DateTime _timestamp { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not TempoTimeStampEvent other)
+                return false;
+
+            if (other == null) return false;
+            return _tempoId == other._tempoId && _timestamp == other._timestamp;
+        }
     }
 }

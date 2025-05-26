@@ -8,7 +8,7 @@ using static ButtonBehaviourDemo.Events.ButtonStateChangedEvent;
 
 namespace ButtonBehaviourDemo.ButtonBehaviours
 {
-    internal class ButtonBehaviourOnOffMomentary : ButtonBehaviourOnOff
+    public class ButtonBehaviourOnOffMomentary : ButtonBehaviourOnOff
     {
         public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {

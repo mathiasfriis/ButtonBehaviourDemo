@@ -55,8 +55,11 @@ namespace ButtonBehaviourTest
 
         private void handleEvents(uint nTimes)
         {
-            buttonInterpretationService.HandleEvents();
-            rx.HandleEvents();
+            for(int i = 0 ; i < nTimes; i++)
+            {
+                buttonInterpretationService.HandleEvents();
+                rx.HandleEvents();
+            }
         }
 
         [Test]
