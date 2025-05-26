@@ -150,7 +150,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter on
+            // Check that we receieved a tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(1));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
 
@@ -163,7 +163,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter off
+            // Check that we receieved another tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(2));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
 
@@ -176,7 +176,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter off
+            // Check that we receieved another tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(3));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
         }
@@ -225,12 +225,14 @@ namespace ButtonBehaviourTest
 
             buttonBehaviourService.SetButtonBehaviour(TEST_KEY, new ButtonBehaviourDemo.ButtonBehaviours.ButtonBehaviourOnOffLatchingPlusTapTempo(eventBus, PARAMETER_NAME, TEMPO_ID));
 
-            //Simulate a regular button press, including release shortly after.
+            //Simulate a press and hold, including release shortly after.
             simulateButtonPressAndHold(time);
             time = time.AddMilliseconds(100);
             simulateButtonRelease(time);
 
             handleEvents(1);
+
+            // We should now be in Tap Tempo session, so tempo events are sent instead of parameter updates.
 
             //Simulate a regular button press, including release shortly after.
             time = time.AddMilliseconds(3000);
@@ -241,7 +243,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter off
+            // Check that we receieved a tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(1));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
 
@@ -254,7 +256,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter off
+            // Check that we receieved another tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(2));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
 
@@ -267,7 +269,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter off
+            // Check that we receieved another tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(3));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
         }
@@ -298,7 +300,7 @@ namespace ButtonBehaviourTest
 
             handleEvents(1);
 
-            // Check that we receieved a message to turn the parameter off
+            // Check that we receieved another tempo message
             Assert.That(rx.Received<TempoTimeStampEvent>(), Is.EqualTo(1));
             Assert.That(rx.ReceivedSimilar<TempoTimeStampEvent>(new TempoTimeStampEvent { _tempoId = TEMPO_ID, _timestamp = timeLastPress }), Is.EqualTo(1));
 
