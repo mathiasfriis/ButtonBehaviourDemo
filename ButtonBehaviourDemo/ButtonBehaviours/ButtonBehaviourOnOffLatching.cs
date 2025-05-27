@@ -10,7 +10,7 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
     {
         public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {
-            // Simple state machine that registers press events and toggles the state of the parameter.
+            // Register press events and toggles the state of the parameter.
             switch (evt._buttonEvent)
             {
                 case Events.ButtonInterpretedEvent.ButtonEvent.ePressed:

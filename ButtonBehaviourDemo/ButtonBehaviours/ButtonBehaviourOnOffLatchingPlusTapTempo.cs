@@ -14,7 +14,7 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
         public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {
             ButtonBehaviourOnOffLatching buttonBehaviourOnOffLatching = new ButtonBehaviourOnOffLatching(_eventBus, _tempoId);
-            // Simple state machine that registers press events and relays the time stamp message to part of the system that takes care of tempo management.
+            // Press and hold switches between latching on/off behaviour and tap tempo behaviour (see documentation for those)
             switch (evt._buttonEvent)
             {
                 case Events.ButtonInterpretedEvent.ButtonEvent.ePressAndHold: // Press and hold switches between the two behaviours.
@@ -31,6 +31,7 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
                         }
                         break;
                     }
+                // Relay relevant events to the appropriate behaviour based on the current session state.
                 case Events.ButtonInterpretedEvent.ButtonEvent.ePressed:
                     {
                         if (_isInTapTempoSession)

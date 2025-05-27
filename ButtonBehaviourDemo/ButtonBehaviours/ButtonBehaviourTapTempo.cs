@@ -10,7 +10,8 @@ namespace ButtonBehaviourDemo.ButtonBehaviours
     {
         public override void handleButtonInterpretedEvent(Events.ButtonInterpretedEvent evt)
         {
-            // Simple state machine that registers press events and relays the time stamp message to part of the system that takes care of tempo management.
+            // Registers press events and relays the time stamp message to part of the system that takes care of tempo management.
+            // Note that the time stamp comes from the event itself.
             switch (evt._buttonEvent)
             {
                 case Events.ButtonInterpretedEvent.ButtonEvent.ePressed:
