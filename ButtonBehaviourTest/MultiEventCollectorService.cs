@@ -3,6 +3,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using ButtonBehaviourDemo.Events;
 
+// Service used in tests.
+// Service can subscribe to multiple event types and collect them in queues.
+// Tester can then check how many events of each type have been received, and how many of them are similar to a provided example event.
 public class MultiEventCollectorService : BaseService
 {
     // Dictionary: event type => queue of events of that type
