@@ -11,8 +11,26 @@ using ButtonBehaviourDemo.ButtonBehaviours;
 // Entry Point
 class Program
 {
+    // Example program to demonstrate interaction between services ButtonService, ButtonInterpretationService, and ButtonBehaviourService.
+
+    // ButtonService monitors the raw key presses and relays these to the ButtonInterpretationService.
+
+    // ButtonInterpretationService interprets the raw key presses into button events (e.g. press, release, multipress, press and hold)
+    // and notifies the ButtonBehaviourService of the interpreted events.
+
+    // ButtonBehaviourService handles the button events and handles domain-specific logic, such as tap tempo, latching, momentary, etc.
+
+
+    // Pressing "a" will toggle the state of a button (i.e. pressed or release) - C# doesn't pr. default allow us to react to key releases, hence the toggling.
+    // Button Behaviour can be changed using
+    // "m" for momentary,
+    // "l" for latching,
+    // "t" for tap tempo, and
+    // "c" for composite behaviour (on/off + tap tempo via press and hold).
+    // Pressing "q" will exit the program.
     static async Task Main()
     {
+        // Service configurations
         ButtonInterpretationServiceConfiguration buttonInterpretationServiceConf = new ButtonInterpretationServiceConfiguration
         {
             _multiPressTimeout = 500, // Example timeout in milliseconds
@@ -24,6 +42,7 @@ class Program
         {
         };
 
+        // Instantiating services
         var bus = new EventBus();
         var buttonService = new ButtonService(bus);
         var buttonInterpretationService = new ButtonInterpretationService(bus, buttonInterpretationServiceConf);
@@ -31,14 +50,17 @@ class Program
         buttonInterpretationService.addKeyToMonitorList('a');
         Dictionary<char, bool> buttonStateMap = new Dictionary<char, bool>();
 
+        // Set default button behaviour
         buttonBehaviourService.SetButtonBehaviour('a', new ButtonBehaviourOnOffLatching(bus, "testParm")); // Set a specific behaviour for the 'a' button
 
+        // Start services
         buttonService.Start(10); // Start the button service with a 10ms interval
         buttonInterpretationService.Start(10); // Start the button interpretation service with a 10ms interval
         buttonBehaviourService.Start(10); // Start the button behaviour service with a 10ms interval
 
         while (true)
         {
+            // Read key input from the console
             ConsoleKeyInfo key = Console.ReadKey(intercept: true); // true = don't display the key
             DateTime timestamp = DateTime.Now;
             char keyChar = key.KeyChar;
@@ -61,7 +83,8 @@ class Program
                     break;
                 default:
                     {
-                        if(buttonStateMap.ContainsKey(keyChar))
+                        // Toggle the button state for the key pressed
+                        if (buttonStateMap.ContainsKey(keyChar))
                         {
                             buttonStateMap[keyChar] = !buttonStateMap[keyChar]; // Toggle state
                         }
@@ -75,16 +98,6 @@ class Program
                         break;
                     }
             }
-        }
-    }
-
-    static async Task StartPeriodicPressAndHoldMonitoringAsync(ButtonInterpretationService buttonInterpretationService, TimeSpan interval, CancellationToken cancellationToken = default)
-    {
-        int counter = 0;
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            buttonInterpretationService.CheckForPressAndHold();
-            await Task.Delay(interval, cancellationToken);
         }
     }
 }
