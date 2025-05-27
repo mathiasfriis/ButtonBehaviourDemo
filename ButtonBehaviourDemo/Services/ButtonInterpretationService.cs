@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace ButtonBehaviourDemo.Services
 {
+    // Service that reacts to raw button state changes and interprets them into higher-level button events.
+    // Events include: press, release, multipress, press and hold.
     public class ButtonInterpretationService : BaseService
     {
         private readonly Dictionary<char, ButtonStateChangedEvent.ButtonState> _buttonStateMap = new(); // Map that tracks the state of each button.
@@ -32,7 +34,10 @@ namespace ButtonBehaviourDemo.Services
             Publish(new ButtonInterpretedEvent { _buttonId = key, _timeStamp = timestamp, _buttonEvent = buttonEvent});
         }
 
-        public async void CheckForPressAndHold() // Getting the time should be done through an interface, allowing mocking in unit tests.
+        // CheckForPressAndHold checks if any button has been pressed for longer than the configured press and hold timeout,
+        // and if so, notifies the system of a press and hold event.
+        // Public for testing purposes.
+        public async void CheckForPressAndHold()
         {
             var timeNow = _conf._timeProvider.GetTime(); // Get the current time from the configured time provider.
             foreach (var buttonState in _buttonStateMap)
@@ -66,13 +71,11 @@ namespace ButtonBehaviourDemo.Services
 
             if (_buttonToLastPressTimeMap.ContainsKey(evt._buttonId))
             {
-                //Console.WriteLine($"[ButtonInterpretationService] Key: " + evt._buttonId + " , State: " + evt._buttonState + ", Time: " + evt._timeStamp.ToString());
-
-                // Check for multiPress
                 switch(evt._buttonState)
                 {
                     case ButtonStateChangedEvent.ButtonState.ePressed:
                     {
+                        // Check for multiPress.
                         // Calculate time since last press
                         TimeSpan timeSinceLastPress = evt._timeStamp - _buttonToLastPressTimeMap[evt._buttonId];
                         if (timeSinceLastPress.TotalMilliseconds <= _conf._multiPressTimeout)

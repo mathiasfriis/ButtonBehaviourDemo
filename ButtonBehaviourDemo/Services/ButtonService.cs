@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 namespace ButtonBehaviourDemo.Services
 {
+    // Service that monitors the raw state of a button and published events when the button state changes.
     public class ButtonService : BaseService
     {
         public ButtonService(EventBus bus) : base(bus)

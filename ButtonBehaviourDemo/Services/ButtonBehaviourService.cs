@@ -6,6 +6,7 @@ using ButtonBehaviourDemo.ButtonBehaviours;
 
 namespace ButtonBehaviourDemo.Services
 {
+    // Service that relays interpreted button events to a configured button behaviour.
     public class ButtonBehaviourService : BaseService
     {
         ButtonBehaviourServiceConfiguration _conf;
