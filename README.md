@@ -19,3 +19,17 @@ sequenceDiagram
 
     ButtonBehaviour->> Rest of system: Behaviour specific messages
 ```
+
+
+## Previous design
+FootswitchService
+ - Readout of specific HW
+ - Calibration of HW
+ - Registration of multiClick and press and hold
+ - Domain/product specific logic regarding footswitch state machines (e.g. entering/exiting Tap Tempo Session)
+ - Tempo detection
+
+Product specific service
+ - Handling footswitch states, triggering events in rest of system
+   - E.g. turning effects on/off
+   - Updating tempo for effect based on received tempo.
